@@ -1,51 +1,99 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import pool from '../utils/db'
+import React, { useState, useEffect } from 'react';
+
+interface Reason {
+  id: number;
+  reason: string;
+}
 
 export function Reason() {
-    const [studentName, setStudentName] = useState("");
-    const [whatHappened, setWhatHappened] = useState("");
-    const [message, setMessage] = useState("");
+  const [reasons, setReasons] = useState<Reason[]>([]);
+  const [newReason, setNewReason] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
-    async function updateWhatHappened() {
-        console.log("검색할 이름:", studentName);
-        try {
-            const result = await pool.query(
-                'UPDATE students SET "whatHappened" = $1 WHERE name = $2 RETURNING *',
-                [whatHappened, studentName]
-            );
+  useEffect(() => {
+    fetchReasons();
+  }, []);
 
-            if (result.rowCount! > 0) {
-                setMessage("결석 사유가 성공적으로 업데이트되었습니다.");
-                setStudentName("");
-                setWhatHappened("");
-            } else {
-                setMessage("해당 이름의 학생을 찾을 수 없습니다.");
-            }
-        } catch (error) {
-            console.error('결석 사유 업데이트 오류:', error);
-            setMessage("결석 사유를 업데이트하는 중 오류가 발생했습니다.");
-        }
+  const fetchReasons = async () => {
+    try {
+      const response = await fetch('/api/reasons');
+      if (!response.ok) {
+        throw new Error('서버 응답 오류');
+      }
+      const data = await response.json();
+      setReasons(data);
+    } catch (error) {
+      console.error('사유 가져오기 오류:', error);
+      setError('사유를 가져오는 중 오류가 발생했습니다.');
     }
+  };
 
-    return (
-        <div>
-            <h1>결석 사유 입력</h1>
-            <input
-                type="text"
-                placeholder="이름을 입력하세요"
-                value={studentName}
-                onChange={(e) => setStudentName(e.target.value)}
-            />
-            <input
-                type="text"
-                placeholder="결석 사유를 입력하세요"
-                value={whatHappened}
-                onChange={(e) => setWhatHappened(e.target.value)}
-            />
-            <button onClick={updateWhatHappened}>제출</button>
-            {message && <p>{message}</p>}
-        </div>
-    )
+  const addReason = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newReason.trim()) return;
+
+    try {
+      const response = await fetch('/api/reasons', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ reason: newReason }),
+      });
+
+      if (!response.ok) {
+        throw new Error('서버 응답 오류');
+      }
+
+      const addedReason = await response.json();
+      setReasons([...reasons, addedReason]);
+      setNewReason('');
+    } catch (error) {
+      console.error('사유 추가 오류:', error);
+      setError('사유를 추가하는 중 오류가 발생했습니다.');
+    }
+  };
+
+  const deleteReason = async (id: number) => {
+    try {
+      const response = await fetch(`/api/reasons?id=${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('서버 응답 오류');
+      }
+
+      setReasons(reasons.filter(reason => reason.id !== id));
+    } catch (error) {
+      console.error('사유 삭제 오류:', error);
+      setError('사유를 삭제하는 중 오류가 발생했습니다.');
+    }
+  };
+
+  return (
+    <div>
+      <h2>사유 관리</h2>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <form onSubmit={addReason}>
+        <input
+          type="text"
+          value={newReason}
+          onChange={(e) => setNewReason(e.target.value)}
+          placeholder="새 사유 입력"
+        />
+        <button type="submit">추가</button>
+      </form>
+      <ul>
+        {reasons.map((reason) => (
+          <li key={reason.id}>
+            {reason.reason}
+            <button onClick={() => deleteReason(reason.id)}>삭제</button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }

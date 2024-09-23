@@ -34,8 +34,12 @@ export function Attendance() {
 
     const refresh = async () => {
         try {
-            const result = await pool.query('SELECT * FROM students ORDER BY "studentId"');
-            setItems(result.rows);
+            const response = await fetch('/api/students');
+            if (!response.ok) {
+                throw new Error('서버 응답 오류');
+            }
+            const data = await response.json();
+            setItems(data);
         } catch (error) {
             console.error('데이터 가져오기 오류:', error);
             setError('데이터를 가져오는 중 오류가 발생했습니다.');
@@ -44,7 +48,16 @@ export function Attendance() {
 
     async function reset(): Promise<void> {
         try {
-            await pool.query('UPDATE students SET attendance = false, "attendanceTime" = NULL');
+            const response = await fetch('/api/students', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ action: 'reset' }),
+            });
+            if (!response.ok) {
+                throw new Error('서버 응답 오류');
+            }
             refresh();
         } catch (error) {
             console.error('출석 초기화 오류:', error);
@@ -55,16 +68,17 @@ export function Attendance() {
     async function updateAttendance() {
         console.log("검색한 UID:", uid);
         try {
-            const now = new Date().toISOString();
-            const result = await pool.query(
-                'UPDATE students SET attendance = true, "attendanceTime" = $1 WHERE uid = $2 RETURNING *',
-                [now, uid]
-            );
-            if (result.rowCount! > 0) {
-                refresh();
-            } else {
-                setError('해당 UID를 가진 학생을 찾을 수 없습니다.');
+            const response = await fetch('/api/students', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ action: 'updateAttendance', uid }),
+            });
+            if (!response.ok) {
+                throw new Error('서버 응답 오류');
             }
+            refresh();
         } catch (error) {
             console.error('출석 업데이트 오류:', error);
             setError('출석을 업데이트하는 중 오류가 발생했습니다.');
