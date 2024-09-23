@@ -17,7 +17,7 @@ export function Attendance() {
     const [items, setItems] = useState<RecordModel[]>([]);
     const [error, setError] = useState();
     const [uid, setUid] = useState("");
-    const pb = new Pocketbase('http://localhost:8090')
+    const pb = new Pocketbase(process.env.NEXT_PUBLIC_POCKETBASE_URL)
 
     useEffect(() => {
         refresh();
