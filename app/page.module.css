@@ -163,3 +163,14 @@ a.secondary {
     filter: invert();
   }
 }
+
+.attendance-table {
+  width: 70%;
+  border-collapse: collapse;
+}
+
+.attendance-table th,
+.attendance-table td {
+  border: 1px solid black;
+  padding: 8px;
+}
