@@ -6,7 +6,6 @@ export default function Home() {
     <div>
       <h1>출석 확인</h1>
       <Attendance />
-      <Reason />
     </div>
   )
 }
