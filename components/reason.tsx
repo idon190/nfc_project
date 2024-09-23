@@ -1,6 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { createPool } from '@vercel/postgres';
+
+const pool = createPool({
+  connectionString: process.env.POSTGRES_URL_NO_SSL,
+});
 
 interface Reason {
   id: number;
@@ -18,37 +23,25 @@ export function Reason() {
 
   const fetchReasons = async () => {
     try {
-      const response = await fetch('/api/reasons');
-      if (!response.ok) {
-        throw new Error('서버 응답 오류');
-      }
-      const data = await response.json();
-      setReasons(data);
+      const { rows } = await pool.query('SELECT * FROM reasons ORDER BY id');
+      setReasons(rows.map(row => ({ id: row.id, reason: row.reason })));
     } catch (error) {
       console.error('사유 가져오기 오류:', error);
       setError('사유를 가져오는 중 오류가 발생했습니다.');
     }
   };
 
-  const addReason = async (e: React.FormEvent) => {
+  const handleAddReason = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newReason.trim()) return;
 
     try {
-      const response = await fetch('/api/reasons', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ reason: newReason }),
-      });
-
-      if (!response.ok) {
-        throw new Error('서버 응답 오류');
-      }
-
-      const addedReason = await response.json();
-      setReasons([...reasons, addedReason]);
+      const { rows } = await pool.query(
+        'INSERT INTO reasons (reason) VALUES ($1) RETURNING id, reason',
+        [newReason]
+      );
+      const newReasonData = rows[0] as Reason;
+      setReasons([...reasons, newReasonData]);
       setNewReason('');
     } catch (error) {
       console.error('사유 추가 오류:', error);
@@ -56,16 +49,9 @@ export function Reason() {
     }
   };
 
-  const deleteReason = async (id: number) => {
+  const handleDeleteReason = async (id: number) => {
     try {
-      const response = await fetch(`/api/reasons?id=${id}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error('서버 응답 오류');
-      }
-
+      await pool.query('DELETE FROM reasons WHERE id = $1', [id]);
       setReasons(reasons.filter(reason => reason.id !== id));
     } catch (error) {
       console.error('사유 삭제 오류:', error);
@@ -75,9 +61,9 @@ export function Reason() {
 
   return (
     <div>
-      <h2>사유 관리</h2>
+      <h2>결석 사유 관리</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={addReason}>
+      <form onSubmit={handleAddReason}>
         <input
           type="text"
           value={newReason}
@@ -90,7 +76,7 @@ export function Reason() {
         {reasons.map((reason) => (
           <li key={reason.id}>
             {reason.reason}
-            <button onClick={() => deleteReason(reason.id)}>삭제</button>
+            <button onClick={() => handleDeleteReason(reason.id)}>삭제</button>
           </li>
         ))}
       </ul>

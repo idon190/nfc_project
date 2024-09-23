@@ -1,7 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import pool from '../utils/db'
+import React, { useState, useEffect } from 'react';
+import { createPool } from '@vercel/postgres';
+
+const pool = createPool({
+  connectionString: process.env.POSTGRES_URL_NO_SSL,
+});
 
 const th = {
     border: '1px solid black',
@@ -15,13 +19,15 @@ const td = {
 
 interface Student {
     id: string;
-    studentId: string;
+    studentId: number;
     name: string;
     attendance: boolean;
     attendanceTime: string | null;
     whatHappened: string | null;
     uid: string;
 }
+
+const { POSTGRES_URL } = process.env;
 
 export function Attendance() {
     const [items, setItems] = useState<Student[]>([]);
@@ -34,12 +40,16 @@ export function Attendance() {
 
     const refresh = async () => {
         try {
-            const response = await fetch('/api/students');
-            if (!response.ok) {
-                throw new Error('서버 응답 오류');
-            }
-            const data = await response.json();
-            setItems(data);
+            const { rows } = await pool.query('SELECT * FROM students');
+            setItems(rows.map((row: any) => ({
+                id: row.id,
+                studentId: row.student_id,
+                name: row.name,
+                attendance: row.attendance,
+                attendanceTime: row.attendance_time,
+                whatHappened: row.what_happened,
+                uid: row.uid
+            })));
         } catch (error) {
             console.error('데이터 가져오기 오류:', error);
             setError('데이터를 가져오는 중 오류가 발생했습니다.');
@@ -48,16 +58,7 @@ export function Attendance() {
 
     async function reset(): Promise<void> {
         try {
-            const response = await fetch('/api/students', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ action: 'reset' }),
-            });
-            if (!response.ok) {
-                throw new Error('서버 응답 오류');
-            }
+            await pool.query('UPDATE students SET attendance = false, attendance_time = NULL, what_happened = NULL');
             refresh();
         } catch (error) {
             console.error('출석 초기화 오류:', error);
@@ -65,19 +66,10 @@ export function Attendance() {
         }
     }
 
-    async function updateAttendance() {
+    async function handleUpdateAttendance() {
         console.log("검색한 UID:", uid);
         try {
-            const response = await fetch('/api/students', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ action: 'updateAttendance', uid }),
-            });
-            if (!response.ok) {
-                throw new Error('서버 응답 오류');
-            }
+            await pool.query('UPDATE students SET attendance = true, attendance_time = NOW() WHERE uid = $1', [uid]);
             refresh();
         } catch (error) {
             console.error('출석 업데이트 오류:', error);
@@ -134,7 +126,7 @@ export function Attendance() {
                     refresh();
                 }}
             />
-            <button onClick={updateAttendance}>UID 지정 출석</button>
+            <button onClick={handleUpdateAttendance}>UID 지정 출석</button>
         </div>
     )
 }
