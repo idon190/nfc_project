@@ -50,7 +50,7 @@ export function Attendance() {
     }
 
     async function updateAttendance() {
-        console.log("검색할 UID:", uid);
+        console.log("검색한 UID:", uid);
         const record = await pb.collection('students').getFirstListItem(`uid="${uid}"`);
         if (record) {
             // 출석 기록 업데이트
@@ -82,17 +82,17 @@ export function Attendance() {
                     <tbody>
                         {items.map((item) => (
                             <tr key={item.id}>
-                                <td style={{ border: '1px solid black', padding: '8px' }}>{item.studentId}</td>
-                                <td style={{ border: '1px solid black', padding: '8px' }}>{item.name}</td>
-                                <td style={{ border: '1px solid black', padding: '8px' }}>
+                                <td style={td}>{item.studentId}</td>
+                                <td style={td}>{item.name}</td>
+                                <td style={td}>
                                     <span style={{ color: item.attendance ? "green" : "red" }}>
                                         {item.attendance ? "출석" : "결석"}
                                     </span>
                                 </td>
-                                <td style={{ border: '1px solid black', padding: '8px' }}>
-                                    {item.attendanceTime ? item.attendanceTime.split('.')[0] : '-'}
+                                <td style={td}>
+                                    {item.attendanceTime ? item.attendanceTime.split('.')[0] : '기록 되지 않음'}
                                 </td>
-                                <td style={{ border: '1px solid black', padding: '8px' }}>
+                                <td style={td}>
                                     {item.whatHappened ? item.whatHappened : '-'}
                                 </td>
                             </tr>
@@ -109,52 +109,10 @@ export function Attendance() {
                 value={uid}
                 onChange={(e) => {
                     setUid(e.target.value);
+                    refresh();
                 }}
             />
-            <button onClick={updateAttendance}>UID 검색</button>
-        </div>
-    )
-}
-
-export function Reason() {
-    const [items, setItems] = useState<RecordModel[]>([]);
-    const pb = new Pocketbase('http://localhost:8090')
-    const [studentName, setStudentName] = useState("");
-    const [whatHappened, setWhatHappened] = useState("");
-
-    async function updateWhatHappened() {
-        console.log("검색할 이름:", studentName);
-        const record = await pb.collection('students').getFirstListItem(`name="${studentName}"`);
-        if (record) {
-            // 결석 사유 업데이트
-            const now = new Date();
-            await pb.collection('students').update(record.id, {
-                whatHappened: whatHappened
-            });
-        }
-    }
-
-
-    return (
-        <div>
-            <h1>결석 사유 입력</h1>
-            <input
-                type="text"
-                placeholder="이름을 입력하세요"
-                value={studentName}
-                onChange={(e) => {
-                    setStudentName(e.target.value);
-                }}
-            />
-            <input
-                type="text"
-                placeholder="결석 사유를 입력하세요"
-                value={whatHappened}
-                onChange={(e) => {
-                    setWhatHappened(e.target.value);
-                }}
-            />
-            <button onClick={updateWhatHappened}>제출</button>
+            <button onClick={updateAttendance}>UID 지정 출석</button>
         </div>
     )
 }
