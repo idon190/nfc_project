@@ -1,7 +1,7 @@
 "use client"
 
-import Pocketbase, { RecordModel } from "pocketbase"
 import { useState, useEffect } from "react"
+import pool from '../utils/db'
 
 const th = {
     border: '1px solid black',
@@ -13,11 +13,20 @@ const td = {
     padding: '8px',
 }
 
+interface Student {
+    id: string;
+    studentId: string;
+    name: string;
+    attendance: boolean;
+    attendanceTime: string | null;
+    whatHappened: string | null;
+    uid: string;
+}
+
 export function Attendance() {
-    const [items, setItems] = useState<RecordModel[]>([]);
-    const [error, setError] = useState();
+    const [items, setItems] = useState<Student[]>([]);
+    const [error, setError] = useState<string | undefined>();
     const [uid, setUid] = useState("");
-    const pb = new Pocketbase(process.env.NEXT_PUBLIC_POCKETBASE_URL)
 
     useEffect(() => {
         refresh();
@@ -25,42 +34,41 @@ export function Attendance() {
 
     const refresh = async () => {
         try {
-            const response = await pb.collection('students').getList(1, 50, {
-                sort: '+studentId',
-            });
-            setItems(response.items);
-            console.log(response.items)
+            const result = await pool.query('SELECT * FROM students ORDER BY "studentId"');
+            setItems(result.rows);
         } catch (error) {
             console.error('데이터 가져오기 오류:', error);
+            setError('데이터를 가져오는 중 오류가 발생했습니다.');
         }
     }
 
     async function reset(): Promise<void> {
         try {
-            for (const item of items) {
-                await pb.collection('students').update(item.id, {
-                    attendance: false,
-                    attendanceTime: null,
-                });
-            }
+            await pool.query('UPDATE students SET attendance = false, "attendanceTime" = NULL');
+            refresh();
         } catch (error) {
             console.error('출석 초기화 오류:', error);
+            setError('출석을 초기화하는 중 오류가 발생했습니다.');
         }
-        refresh();
     }
 
     async function updateAttendance() {
         console.log("검색한 UID:", uid);
-        const record = await pb.collection('students').getFirstListItem(`uid="${uid}"`);
-        if (record) {
-            // 출석 기록 업데이트
-            const now = new Date();
-            await pb.collection('students').update(record.id, {
-                attendance: true,
-                attendanceTime: now.toISOString()
-            });
+        try {
+            const now = new Date().toISOString();
+            const result = await pool.query(
+                'UPDATE students SET attendance = true, "attendanceTime" = $1 WHERE uid = $2 RETURNING *',
+                [now, uid]
+            );
+            if (result.rowCount! > 0) {
+                refresh();
+            } else {
+                setError('해당 UID를 가진 학생을 찾을 수 없습니다.');
+            }
+        } catch (error) {
+            console.error('출석 업데이트 오류:', error);
+            setError('출석을 업데이트하는 중 오류가 발생했습니다.');
         }
-        refresh();
     }
 
     return (
