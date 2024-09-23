@@ -4,7 +4,6 @@ import { useState } from "react"
 import Pocketbase, { RecordModel } from "pocketbase"
 
 export function Reason() {
-    const [items, setItems] = useState<RecordModel[]>([]);
     const pb = new Pocketbase(process.env.NEXT_PUBLIC_POCKETBASE_URL)
     const [studentName, setStudentName] = useState("");
     const [whatHappened, setWhatHappened] = useState("");
