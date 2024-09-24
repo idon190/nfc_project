@@ -1,13 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import PocketBase from 'pocketbase';
-
 
 export function Reason() {
   const [studentName, setStudentName] = useState("");
   const [whatHappened, setWhatHappened] = useState("");
-  const pb = new PocketBase('http://127.0.0.1:8090');
+  const pb = new PocketBase(process.env.NEXT_PUBLIC_POCKETBASE_URL);
 
   async function updateWhatHappened() {
     console.log("검색할 이름:", studentName);

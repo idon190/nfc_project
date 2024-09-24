@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import PocketBase, { RecordModel } from 'pocketbase';
 
 const th = {
@@ -17,7 +17,7 @@ export function Attendance() {
     const [items, setItems] = useState<RecordModel[]>([]);
     const [error, setError] = useState<string | undefined>();
     const [uid, setUid] = useState("");
-    const pb = new PocketBase('http://127.0.0.1:8090');
+    const pb = new PocketBase(process.env.NEXT_PUBLIC_POCKETBASE_URL);
 
     const refresh = async () => {
         const response = await pb.collection('students').getList(1, 50, {
