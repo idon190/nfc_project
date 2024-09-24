@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PocketBase from 'pocketbase';
 
 export function Reason() {
@@ -10,35 +10,87 @@ export function Reason() {
 
   async function updateWhatHappened() {
     console.log("검색할 이름:", studentName);
-        const record = await pb.collection('students').getFirstListItem(`name="${studentName}"`);
-        if (record) {
-            // 결석 사유 업데이트
-            await pb.collection('students').update(record.id, {
-                whatHappened: whatHappened
-            });
-        }
+    const record = await pb.collection('students').getFirstListItem(`name="${studentName}"`);
+    if (record) {
+      await pb.collection('students').update(record.id, {
+        whatHappened: whatHappened
+      });
     }
+  }
+
+  useEffect(() => {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = styles;
+    document.head.appendChild(styleElement);
+
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
 
   return (
-    <div>
-      <h1>결석 사유 입력</h1>
-      <input
+    <div className="attendance-container">
+      <h1 className="attendance-title">결석 사유 입력</h1>
+      <div className="input-group">
+        <input
           type="text"
           placeholder="이름을 입력하세요"
           value={studentName}
-          onChange={(e) => {
-            setStudentName(e.target.value);
-          }}
-      />
-      <input
+          onChange={(e) => setStudentName(e.target.value)}
+          className="uid-input"
+        />
+        <input
           type="text"
           placeholder="결석 사유를 입력하세요"
           value={whatHappened}
-          onChange={(e) => {
-            setWhatHappened(e.target.value);
-          }}
-      />
-      <button onClick={updateWhatHappened}>제출</button>  
+          onChange={(e) => setWhatHappened(e.target.value)}
+          className="uid-input"
+        />
+        <button onClick={updateWhatHappened} className="action-button">제출</button>
+      </div>
     </div>
   );
 }
+
+const styles = `
+.attendance-container {
+    font-family: Arial, sans-serif;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.attendance-title {
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.uid-input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 300px;
+}
+
+.action-button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.action-button:hover {
+    background-color: #45a049;
+}
+`;
