@@ -60,35 +60,35 @@ export function Attendance() {
     }
 
     return (
-        <div>
-            <h2>학생 목록</h2>
+        <div className="attendance-container">
+            <h2 className="attendance-title">학생 목록</h2>
             {error ? (
-                <p>{error}</p>
+                <p className="error-message">{error}</p>
             ) : (
-                <table style={{ width: '70%', borderCollapse: 'collapse' }}>
+                <table className="attendance-table">
                     <thead>
                         <tr>
-                            <th style={th}>학번</th>
-                            <th style={th}>이름</th>
-                            <th style={th}>출석 상태</th>
-                            <th style={th}>출석 일자</th>
-                            <th style={th}>결석 사유</th>
+                            <th>학번</th>
+                            <th>이름</th>
+                            <th>출석 상태</th>
+                            <th>출석 일자</th>
+                            <th>결석 사유</th>
                         </tr>
                     </thead>
                     <tbody>
                         {items.map((item) => (
                             <tr key={item.id}>
-                                <td style={td}>{item.studentId}</td>
-                                <td style={td}>{item.name}</td>
-                                <td style={td}>
-                                    <span style={{ color: item.attendance ? "green" : "red" }}>
+                                <td>{item.studentId}</td>
+                                <td>{item.name}</td>
+                                <td>
+                                    <span className={`attendance-status ${item.attendance ? "present" : "absent"}`}>
                                         {item.attendance ? "출석" : "결석"}
                                     </span>
                                 </td>
-                                <td style={td}>
+                                <td>
                                     {item.attendanceTime ? item.attendanceTime.split('.')[0] : '기록 되지 않음'}
                                 </td>
-                                <td style={td}>
+                                <td>
                                     {item.attendance ? '-' : item.whatHappened}
                                 </td>
                             </tr>
@@ -96,20 +96,122 @@ export function Attendance() {
                     </tbody>
                 </table>
             )}
-            <p></p>
-            <button onClick={refresh}>새로고침</button>
-            <button onClick={reset}>초기화</button>
-            <p></p>
-            <input
-                type="text"
-                placeholder="UID를 입력하세요"
-                value={uid}
-                onChange={(e) => {
-                    setUid(e.target.value);
-                    refresh();
-                }}
-            />
-            <button onClick={updateAttendance}>UID 지정 출석</button>
+            <div className="button-group">
+                <button className="action-button" onClick={refresh}>새로고침</button>
+                <button className="action-button" onClick={reset}>초기화</button>
+            </div>
+            <div className="uid-input-group">
+                <input
+                    type="text"
+                    placeholder="UID를 입력하세요"
+                    value={uid}
+                    onChange={(e) => {
+                        setUid(e.target.value);
+                        refresh();
+                    }}
+                    className="uid-input"
+                />
+                <button className="action-button" onClick={updateAttendance}>UID 지정 출석</button>
+            </div>
         </div>
     )
 }
+
+// 스타일 추가
+const styles = `
+.attendance-container {
+    font-family: Arial, sans-serif;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.attendance-title {
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.attendance-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.attendance-table th, .attendance-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+.attendance-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.attendance-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.attendance-status {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-weight: bold;
+}
+
+.attendance-status.present {
+    background-color: #e6f7e6;
+    color: #2e7d32;
+}
+
+.attendance-status.absent {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.action-button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.action-button:hover {
+    background-color: #45a049;
+}
+
+.uid-input-group {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.uid-input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 200px;
+}
+
+.error-message {
+    color: #c62828;
+    text-align: center;
+    margin-bottom: 20px;
+}
+`;
+
+// 스타일을 head에 추가
+const styleElement = document.createElement('style');
+styleElement.textContent = styles;
+document.head.appendChild(styleElement);
