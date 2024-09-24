@@ -8,7 +8,8 @@ const th = {
     padding: '8px',
 }
 
-const td = {
+const td: React.CSSProperties = {
+    textAlign: 'center',
     border: '1px solid black',
     padding: '8px',
 }
@@ -45,6 +46,7 @@ export function Attendance() {
     async function updateAttendance() {
         console.log("검색한 UID:", uid);
         const now = new Date().toISOString();
+        
         const record = await pb.collection('students').getFirstListItem(`uid="${uid}"`);
         if (record) {
             await pb.collection('students').update(record.id, {
@@ -87,13 +89,14 @@ export function Attendance() {
                                     {item.attendanceTime ? item.attendanceTime.split('.')[0] : '기록 되지 않음'}
                                 </td>
                                 <td style={td}>
-                                    {item.whatHappened ? item.whatHappened : '-'}
+                                    {item.attendance ? '-' : item.whatHappened}
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
             )}
+            <p></p>
             <button onClick={refresh}>새로고침</button>
             <button onClick={reset}>초기화</button>
             <p></p>
