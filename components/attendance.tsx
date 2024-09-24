@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PocketBase, { RecordModel } from 'pocketbase';
 
 const th = {
@@ -58,6 +58,18 @@ export function Attendance() {
         setUid(""); // UID 입력 필드 초기화
         refresh();
     }
+
+    useEffect(() => {
+        // 스타일을 head에 추가
+        const styleElement = document.createElement('style');
+        styleElement.textContent = styles;
+        document.head.appendChild(styleElement);
+
+        // 컴포넌트가 언마운트될 때 스타일 요소 제거
+        return () => {
+            document.head.removeChild(styleElement);
+        };
+    }, []); // 빈 배열을 전달하여 마운트 시에만 실행
 
     return (
         <div className="attendance-container">
@@ -210,8 +222,3 @@ const styles = `
     margin-bottom: 20px;
 }
 `;
-
-// 스타일을 head에 추가
-const styleElement = document.createElement('style');
-styleElement.textContent = styles;
-document.head.appendChild(styleElement);
