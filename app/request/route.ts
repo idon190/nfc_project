@@ -1,7 +1,7 @@
 
 import PocketBase from 'pocketbase'
 
-export async function Post(request: Request) {
+export async function POST(request: Request) {
     const pb = new PocketBase(process.env.NEXT_PUBLIC_POCKETBASE_URL);
     const uid = await request.json();
     console.log(uid)
