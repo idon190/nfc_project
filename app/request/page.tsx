@@ -1,34 +1,40 @@
+
 import PocketBase from 'pocketbase';
-import { NextApiRequest, NextApiResponse } from 'next';
 
 const pb = new PocketBase(process.env.NEXT_PUBLIC_POCKETBASE_URL);
 
 async function processAttendance(uid: string) {
-  await pb.collection('students').update(uid, {
+
+  const record = await pb.collection('students').getFirstListItem(`uid="${uid}"`);
+
+  await pb.collection('students').update(record.uid, {
     attendance: true,
     attendanceTime: new Date().toISOString(),
   });
 
   return { message: '출석이 성공적으로 처리되었습니다.' };
+
 }
 
-export default async function AttendancePage(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: '허용되지 않는 메서드입니다.' });
-  }
+interface AttendancePageProps {
+  searchParams: { uid?: string };
+}
 
-  // POST 요청의 본문에서 UID를 가져옵니다.
-  const { uid } = req.body;
+export default async function AttendancePage({ searchParams }: AttendancePageProps) {
+  // searchParams에서 UID를 가져옵니다.
+  const uid = searchParams.uid;
 
-  if (!uid || Array.isArray(uid)) {
-    return res.status(400).json({ message: '오류: 유효한 UID가 제공되지 않았습니다.' });
+  if (uid === undefined) {
+    alert('잘못된 UID 입니다.')
   }
 
   try {
-    const result = await processAttendance(uid);
-    return res.status(200).json(result);
+    const result = await processAttendance(uid!);
+    return new Response(JSON.stringify(result), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (error) {
-    console.error('출석 처리 중 오류 발생:', error);
-    return res.status(500).json({ message: `오류: ${(error as Error).message}` });
+    return new Response(`오류: ${(error as Error).message}`, { status: 500 });
   }
 }
