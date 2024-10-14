@@ -7,7 +7,7 @@ async function processAttendance(uid: string) {
 
   const record = await pb.collection('students').getFirstListItem(`uid="${uid}"`);
 
-  await pb.collection('students').update(record.uid, {
+  await pb.collection('students').update(record.id, {
     attendance: true,
     attendanceTime: new Date().toISOString(),
   });
