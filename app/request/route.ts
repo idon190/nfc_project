@@ -3,11 +3,10 @@ import PocketBase from 'pocketbase'
 
 export async function POST(request: Request) {
     const pb = new PocketBase(process.env.NEXT_PUBLIC_POCKETBASE_URL);
-    const uid = await request.json();
-    console.log(uid)
+    const res = await request.json();
 
     try {
-        const record = await pb.collection('students').getFirstListItem(`uid="${uid}"`)
+        const record = await pb.collection('students').getFirstListItem(`uid="${res.uid}"`)
         pb.collection('students').update(record.id, {
             attendance: true,
             attendanceTime: new Date().toISOString
