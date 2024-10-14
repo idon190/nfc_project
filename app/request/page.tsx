@@ -1,4 +1,4 @@
-
+/*
 import PocketBase from 'pocketbase';
 
 const pb = new PocketBase(process.env.NEXT_PUBLIC_POCKETBASE_URL);
@@ -38,3 +38,4 @@ export default async function AttendancePage({ searchParams }: AttendancePagePro
     return new Response(`오류: ${(error as Error).message}`, { status: 500 });
   }
 }
+*/
