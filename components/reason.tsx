@@ -11,11 +11,11 @@ export function Reason() {
   async function updateWhatHappened() {
     console.log("검색할 이름:", studentName);
     const record = await pb.collection('students').getFirstListItem(`name="${studentName}"`);
-    if (record) {
-      await pb.collection('students').update(record.id, {
-        whatHappened: whatHappened
-      });
-    }
+    
+    await pb.collection('students').update(record.id, {
+      whatHappened: whatHappened
+    });
+
   }
 
   useEffect(() => {

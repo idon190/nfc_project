@@ -3,24 +3,13 @@
 import { useState, useEffect } from 'react';
 import PocketBase, { RecordModel } from 'pocketbase';
 
-const th = {
-    border: '1px solid black',
-    padding: '8px',
-}
-
-const td: React.CSSProperties = {
-    textAlign: 'center',
-    border: '1px solid black',
-    padding: '8px',
-}
-
 export function Attendance() {
     const [items, setItems] = useState<RecordModel[]>([]);
     const [error, setError] = useState<string | undefined>();
     const [uid, setUid] = useState("");
     const pb = new PocketBase(process.env.NEXT_PUBLIC_POCKETBASE_URL);
 
-    const refresh = async () => {
+    async function refresh() {
         const response = await pb.collection('students').getList(1, 50, {
             sort: '+studentId',
         });
