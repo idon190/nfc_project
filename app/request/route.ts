@@ -7,10 +7,13 @@ export async function POST(request: Request) {
 
     try {
         const record = await pb.collection('students').getFirstListItem(`uid="${res.uid}"`)
-        pb.collection('students').update(record.id, {
-            attendance: true,
-            attendanceTime: new Date().toISOString
-        })
+        if (record) {
+            await pb.collection('students').update(record.id, {
+                attendance: true,
+                attendanceTime: new Date().toISOString,
+            });
+
+        }
     } catch (error) {
         console.error(error);
     }
