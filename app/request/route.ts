@@ -8,11 +8,10 @@ export async function POST(request: Request) {
     try {
         const record = await pb.collection('students').getFirstListItem(`uid="${res.uid}"`)
         if (record) {
-            const date = new Date().toISOString()
-            const dateText = date[0] + " " + date[1].split('.')[0]
+
             await pb.collection('students').update(record.id, {
                 attendance: true,
-                attendanceTime: dateText
+                attendanceTime: new Date().toISOString()
             });
 
         }
