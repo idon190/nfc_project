@@ -4,7 +4,7 @@ import PocketBase from 'pocketbase'
 function dateText() {
     const date = new Date().toISOString().split('T')
     console.log(date)
-    return date[0] + date[1].split('.')[0]
+    return date[0] + " " + date[1].split('.')[0]
 }
 
 export async function POST(request: Request) {
