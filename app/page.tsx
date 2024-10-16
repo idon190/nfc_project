@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 
 export default function Home() {
   return (
-    <div>
+    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
       <Attendance />
       <Reason />
     </div>

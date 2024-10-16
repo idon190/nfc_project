@@ -24,6 +24,7 @@ export function Attendance() {
                     attendanceTime: null,
                 });
             }
+            alert('출석을 초기화하는데 성공했습니다. 새로고침을 눌러주세요')
         } catch (error) {
             console.error('출석 초기화 오류:', error);
             setError('출석을 초기화하는 중 오류가 발생했습니다.');
