@@ -1,6 +1,11 @@
 
 import PocketBase from 'pocketbase'
 
+function dateText() {
+    const date = new Date().toISOString()
+    return date[0] + date[1].split('.')[0]
+}
+
 export async function POST(request: Request) {
     const pb = new PocketBase(process.env.NEXT_PUBLIC_POCKETBASE_URL);
     const res = await request.json();
@@ -11,7 +16,7 @@ export async function POST(request: Request) {
 
             await pb.collection('students').update(record.id, {
                 attendance: true,
-                attendanceTime: new Date().toISOString()
+                attendanceTime: dateText()
             });
 
         }
