@@ -29,7 +29,7 @@ export function Attendance() {
             console.error('출석 초기화 오류:', error);
             setError('출석을 초기화하는 중 오류가 발생했습니다.');
         }
-        refresh();
+        await refresh();
     }
 
     useEffect(() => {
