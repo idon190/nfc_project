@@ -6,7 +6,6 @@ import PocketBase, { RecordModel } from 'pocketbase';
 export function Attendance() {
     const [items, setItems] = useState<RecordModel[]>([]);
     const [error, setError] = useState<string | undefined>();
-    const [uid, setUid] = useState("");
     const pb = new PocketBase(process.env.NEXT_PUBLIC_POCKETBASE_URL);
 
     async function refresh() {
@@ -29,22 +28,6 @@ export function Attendance() {
             console.error('출석 초기화 오류:', error);
             setError('출석을 초기화하는 중 오류가 발생했습니다.');
         }
-        refresh();
-    }
-
-    async function updateAttendance() {
-        console.log("검색한 UID:", uid);
-        const now = new Date().toISOString();
-        
-        const record = await pb.collection('students').getFirstListItem(`uid="${uid}"`);
-        if (record) {
-            await pb.collection('students').update(record.id, {
-                attendance: true,
-                attendance_time: now,
-            });
-            
-        }
-        setUid(""); // UID 입력 필드 초기화
         refresh();
     }
 
@@ -100,19 +83,6 @@ export function Attendance() {
             <div className="button-group">
                 <button className="action-button" onClick={refresh}>새로고침</button>
                 <button className="action-button" onClick={reset}>초기화</button>
-            </div>
-            <div className="uid-input-group">
-                <input
-                    type="text"
-                    placeholder="UID를 입력하세요"
-                    value={uid}
-                    onChange={(e) => {
-                        setUid(e.target.value);
-                        refresh();
-                    }}
-                    className="uid-input"
-                />
-                <button className="action-button" onClick={updateAttendance}>UID 지정 출석</button>
             </div>
         </div>
     )
