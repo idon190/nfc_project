@@ -91,9 +91,14 @@ export function Attendance() {
 
 // 스타일 추가
 const styles = `
+td {
+    display: grid;
+    justify-content: center;
+}
+
 .attendance-container {
     font-family: Arial, sans-serif;
-    max-width: 900px;
+    max-width: 800px;
     margin: 0 auto;
     padding: 35px;
 }

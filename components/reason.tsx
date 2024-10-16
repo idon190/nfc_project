@@ -34,18 +34,18 @@ export function Reason() {
 
   return (
     <div className="reason-container">
-      <h1 className="reason-title">결석 사유 입력</h1>
+      <h2 className="reason-title">결석 사유 입력</h2>
       <div className="input-group">
         <input
           type="text"
-          placeholder="이름을 입력하세요"
+          placeholder="이름을 입력해주세요"
           value={studentName}
           onChange={(e) => setStudentName(e.target.value)}
           className="uid-input"
         />
         <input
           type="text"
-          placeholder="결석 사유를 입력하세요"
+          placeholder="결석 사유를 입력해주세요"
           value={whatHappened}
           onChange={(e) => setWhatHappened(e.target.value)}
           className="uid-input"
@@ -58,8 +58,9 @@ export function Reason() {
 
 const styles = `
 .reason-container {
+    position:
     font-family: Arial, sans-serif;
-    max-width: 900px;
+    max-width: 500px;
     margin: 0 auto;
     padding: 35px;
 }
@@ -81,7 +82,7 @@ const styles = `
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    width: 300px;
+    width: 200px;
 }
 
 .action-button {
