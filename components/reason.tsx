@@ -16,6 +16,10 @@ export function Reason() {
       whatHappened: whatHappened
     });
 
+    setStudentName("")
+    setWhatHappened("")
+    alert('결석 사유가 업데이트 되었습니다. 새로고침을 눌러주세요')
+
   }
 
   useEffect(() => {
@@ -29,8 +33,8 @@ export function Reason() {
   }, []);
 
   return (
-    <div className="attendance-container">
-      <h1 className="attendance-title">결석 사유 입력</h1>
+    <div className="reason-container">
+      <h1 className="reason-title">결석 사유 입력</h1>
       <div className="input-group">
         <input
           type="text"
@@ -53,14 +57,14 @@ export function Reason() {
 }
 
 const styles = `
-.attendance-container {
+.reason-container {
     font-family: Arial, sans-serif;
     max-width: 900px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 35px;
 }
 
-.attendance-title {
+.reason-title {
     color: #333;
     text-align: center;
     margin-bottom: 20px;

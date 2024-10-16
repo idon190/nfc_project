@@ -10,13 +10,13 @@ function dateText() {
     [3] : 년
     [4] : 시간
     */
-    const dateText = date[3] //년
-        + "-" //-
+    const dateText = date[3]     //년
+        + "-"                    //-
         + monthToNumber(date[1]) //월(숫자)
-        + "-" //-
-        + date[2] //일
-        + " " //공백
-        + date[4] //시간(00:00:00)
+        + "-"                    //-
+        + date[2]                //일
+        + " "                    //공백
+        + date[4]                //시간(00:00:00)
     return dateText
 }
 
