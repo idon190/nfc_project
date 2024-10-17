@@ -93,7 +93,7 @@ export function Attendance() {
 const styles = `
 
 .centered-cell {
-    test-align: center;
+    text-align: center;
     vertical-align: middle;
 }
 
@@ -120,7 +120,7 @@ const styles = `
 .attendance-table th, .attendance-table td {
     border: 1px solid #ddd;
     padding: 12px;
-    text-align: left;
+    text-align: center;
 }
 
 .attendance-table th {
