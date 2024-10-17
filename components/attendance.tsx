@@ -63,17 +63,17 @@ export function Attendance() {
                     <tbody>
                         {items.map((item) => (
                             <tr key={item.id}>
-                                <td>{item.studentId}</td>
-                                <td>{item.name}</td>
-                                <td>
+                                <td className="centered-cell">{item.studentId}</td>
+                                <td className="centered-cell">{item.name}</td>
+                                <td className="centered-cell">
                                     <span className={`attendance-status ${item.attendance ? "present" : "absent"}`}>
                                         {item.attendance ? "출석" : "결석"}
                                     </span>
                                 </td>
-                                <td>
+                                <td className="centered-cell">
                                     {item.attendanceTime ? item.attendanceTime.split('.')[0] : '기록 되지 않음'}
                                 </td>
-                                <td>
+                                <td className="centered-cell">
                                     {item.attendance ? '-' : item.whatHappened}
                                 </td>
                             </tr>
@@ -91,9 +91,10 @@ export function Attendance() {
 
 // 스타일 추가
 const styles = `
-td {
-    display: grid;
-    justify-content: center;
+
+.centered-cell {
+    test-align: center;
+    vertical-align: middle;
 }
 
 .attendance-container {
