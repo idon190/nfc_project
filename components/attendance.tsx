@@ -6,6 +6,7 @@ import PocketBase, { RecordModel } from 'pocketbase';
 export function Attendance() {
     const [items, setItems] = useState<RecordModel[]>([]);
     const [error, setError] = useState<string | undefined>();
+    const [isLoading, setIsLoading] = useState(false); // 로딩 상태 추가
     const pb = new PocketBase(process.env.NEXT_PUBLIC_POCKETBASE_URL);
 
     async function refresh() {
@@ -17,6 +18,7 @@ export function Attendance() {
     }
 
     async function reset(): Promise<void> {
+        setIsLoading(true); // 초기화 시작 시 로딩 상태 설정
         try {
             for (const item of items) {
                 await pb.collection('students').update(item.id, {
@@ -24,12 +26,13 @@ export function Attendance() {
                     attendanceTime: null,
                 });
             }
-            alert('출석을 초기화하는데 성공했습니다. 새로고침을 눌러주세요')
+            alert('출석을 초기화하는데 성공했습니다.')
         } catch (error) {
             console.error('출석 초기화 오류:', error);
             setError('출석을 초기화하는 중 오류가 발생했습니다.');
         }
         await refresh();
+        setIsLoading(false); // 초기화 완료 후 로딩 상태 해제
     }
 
     useEffect(() => {
@@ -83,7 +86,9 @@ export function Attendance() {
             )}
             <div className="button-group">
                 <button className="action-button" onClick={refresh}>새로고침</button>
-                <button className="action-button" onClick={reset}>초기화</button>
+                <button className={`action-button ${isLoading ? 'loading' : ''}`} onClick={reset} disabled={isLoading}>
+                    {isLoading ? '초기화 중...' : '초기화'}
+                </button>
             </div>
         </div>
     )
@@ -93,7 +98,7 @@ export function Attendance() {
 const styles = `
 
 .centered-cell {
-    text-align: center;
+    text-align: center; 
     vertical-align: middle;
 }
 
@@ -186,5 +191,11 @@ const styles = `
     color: #c62828;
     text-align: center;
     margin-bottom: 20px;
+}
+
+.action-button.loading {
+    background-color: #ccc; /* 로딩 중 버튼 색상 변경 */
+    cursor: not-allowed; /* 커서 변경 */
+    transition: background-color 0.3s; /* 부드러운 전환 효과 */
 }
 `;
