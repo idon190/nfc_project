@@ -5,7 +5,9 @@ export async function GET(request : Request) {
     const res = request.json()
 
     try {
-        const record = await pb.collection('students')
+        const record = await pb.collection('students').getList(1, 50, {
+            sort: '+studentId',
+        });
         console.log(record)
     } catch(error) {
         console.error(error)
